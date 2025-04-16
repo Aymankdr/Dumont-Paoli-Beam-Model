@@ -29,7 +29,7 @@ if __name__ == '__main__':
     I = (np.pi/64)*(diam_max**4-diam_min**4) # Inertia Moment
     S = np.pi*((diam_max/2)**2-(diam_min/2)**2) # Section Area
     rho = 8000   # Density
-    alpha = 1e-4 # Damping Coefficient
+    alpha = 1e-2 # Damping Coefficient
 
     # ----------- Space discretised beam model ------------
     L  = 1.501  # Total Length
@@ -37,16 +37,25 @@ if __name__ == '__main__':
     mass_matrix_type = 'Regular'
     mass_matrix_type = 'Singular'
 
+    # ------------------- Obstacles ----------------------
+    contact_type = 'Ponctual'
+    contact_type = 'Planar'
+    gap, bending = 0.05, 0.03
+    inf_obs, sup_obs = -gap, gap
+    inf_obs, sup_obs = -gap, (gap, 2*gap)
+    inf_obs, sup_obs = -gap, [4*bending/L**2, -4*bending/L, gap]
+    inf_obs, sup_obs = [-4*bending/L**2, 4*bending/L, -gap], [4*bending/L**2, -4*bending/L, gap]
+
     # ----------- Time discretised beam model ------------
     dt    = 0.01
     tmax  = 3.0
-    amp   = 0.2
+    amp   = 0.5
     omega = 10.0
     beta  = 1/4
     e     = 0
     solve_method = 'Penalty'
     solve_method = 'Lagrangian'
-    epsilonp = 1e-4
+    epsilonp = 5e+0
 
     # ------------ Initial Conditions --------------------
     u0 = np.poly1d([0]) # lambda x: 0
@@ -54,7 +63,7 @@ if __name__ == '__main__':
 
     # -------------------- Classes -------------------
     BP = bp.BeamProperties(E,I,rho,S,alpha) # BeamProperties class element
-    OP = op.ObstacleProperties(0.05,-0.05, 2*Nbel, L) # ObstacleProperties class element
+    OP = op.ObstacleProperties(inf_obs, sup_obs, 2*Nbel, L, contact_type) # ObstacleProperties class element
     BM = bm.DumontPaoliBeamModel(L, Nbel, mass_matrix_type, BP)
     TIM = tim.TimeIntegrationModel(BM, OP, u0, v0, dt, tmax, amp, omega, beta, e, solve_method, epsilonp)
 
@@ -64,7 +73,7 @@ if __name__ == '__main__':
 
     P = TIM.compute_FirstTermMatrix()
 
-    r = TIM.penalty_force(np.array(Nbel//2*[2,0,-3,0]))
+    r = TIM.penalty_force(np.array(Nbel//2*[2,0,-3,0])); print(r)
 
     """
     print(OP.contact_test(Qn))
