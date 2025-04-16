@@ -175,17 +175,33 @@ class TimeIntegrationModel:
 
         fig, ax = plt.subplots(figsize=(12,5))
         ax.set_xlim([-0.1, L*1.1])
+
+        # Defining the screen limits
+        x = np.linspace(0, L, self.Nbel)
+        if type(self.OP.inf_obs) is tuple: inf_obs0 = min(self.OP.inf_obs)
+        elif type(self.OP.inf_obs) is list: inf_obs0 = min(self.OP.g1(x))
+        else: inf_obs0 = self.OP.inf_obs
+        if type(self.OP.sup_obs) is tuple: sup_obs0 = max(self.OP.sup_obs)
+        elif type(self.OP.sup_obs) is list: sup_obs0 = max(self.OP.g2(x))
+        else: sup_obs0 = self.OP.sup_obs
+
         if self.OP.contact_type=='Planar':
-            ax.set_ylim([1.4*self.OP.inf_obs, 1.4*self.OP.sup_obs])
+            ax.set_ylim([1.4*inf_obs0, 1.4*sup_obs0])
         elif self.OP.contact_type=='Ponctual':
-            ax.set_ylim([self.OP.inf_obs*1.1, self.OP.sup_obs*1.1])
+            ax.set_ylim([inf_obs0*1.1, sup_obs0*1.1])
 
         # ax.set_ylim([-5,5])
 
         # Plot static permanent lines within the y-axis limits
         if self.OP.contact_type == 'Planar':
-            static_line1, = ax.plot([0, L], [self.OP.sup_obs, self.OP.sup_obs], '--', color='red', linewidth=3)
-            static_line2, = ax.plot([0, L], [self.OP.inf_obs, self.OP.inf_obs], '--', color='red', linewidth=3)
+            if type(self.OP.sup_obs) is tuple:
+                static_line1, = ax.plot([0, L], [self.OP.sup_obs[0], self.OP.sup_obs[1]], '--', color='red', linewidth=3)
+            else:
+                static_line1, = ax.plot(x, self.OP.upper_bound[::2], '--', color='red', linewidth=3)  #[self.OP.sup_obs, self.OP.sup_obs]
+            if type(self.OP.inf_obs) is tuple:
+                static_line2, = ax.plot([0, L], [self.OP.inf_obs[0], self.OP.inf_obs[1]], '--', color='red', linewidth=3)
+            else:
+                static_line2, = ax.plot(x, self.OP.lower_bound[::2], '--', color='red', linewidth=3)
         elif self.OP.contact_type == 'Ponctual':
             static_line1 = ax.scatter([L], [self.OP.sup_obs], s=50, color='red', marker='o')
             static_line2 = ax.scatter([L], [self.OP.inf_obs], s=50, color='red', marker='o')
