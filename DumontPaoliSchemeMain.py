@@ -12,7 +12,7 @@ import copy
 import sys
 import platform
 # Importing other files
-sys.path.insert(1,'C:/Users/AYMAN/Desktop/scripts_python/PhD_beam/personal_version')
+sys.path.insert(1,'C:/...file_address')
 import BeamPropertiesClass as bp
 import ObstaclePropertiesClass as op
 import BeamModelClass as bm
