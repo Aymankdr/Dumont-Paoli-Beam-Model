@@ -12,7 +12,7 @@ import copy
 import sys
 import platform
 # Importing other files
-sys.path.insert(1,'C:/...file_address')
+#sys.path.insert(1,'C:/...file_address')
 import BeamPropertiesClass as bp
 import ObstaclePropertiesClass as op
 import BeamModelClass as bm
